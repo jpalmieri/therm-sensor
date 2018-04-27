@@ -10,31 +10,34 @@ module Therm
 
     def initialize
       @base_uri = BASE_URL
-      @auth_token = get_token
+      @auth_token = fetch_token
     end
 
     def post(target, options)
       uri = URI("#{@base_uri}#{target}")
       request = post_request(uri, options, @auth_token)
-      return process_http_response(uri, request)
+      response = make_http_request(uri, request)
+      return process_response(response)
     end
 
     def get(target, options={})
       uri = URI("#{@base_uri}#{target}")
       request = get_request(uri, options, @auth_token)
-      return process_http_response(uri, request)
+      response = make_http_request(uri, request)
+      return process_response(response)
     end
 
     private
 
-    def get_token
+    def fetch_token
       uri = URI("#{@base_uri}/auth/login")
       options = {
         email: EMAIL,
         password: PASSWORD
       }
       request = post_request(uri, options)
-      return process_http_response(uri, request)
+      response = make_http_request(uri, request)
+      return process_response(response)
     end
 
     def get_request(uri, options, auth_token=nil)
@@ -57,11 +60,14 @@ module Therm
       return request
     end
 
-    def process_http_response(uri, request)
+    def make_http_request(uri, request)
       response = Net::HTTP.start(uri.hostname, uri.port) do |http|
         http.request(request)
       end
+      return response
+    end
 
+    def process_response(response)
       case response
       when Net::HTTPSuccess
         return JSON.parse(response.body)
