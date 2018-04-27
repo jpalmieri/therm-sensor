@@ -10,57 +10,44 @@ module Therm
 
     def initialize
       @base_uri = BASE_URL
-      @auth_token = fetch_token
+      @auth_token = fetch_token(EMAIL, PASSWORD)
     end
 
     def post(target, options)
-      uri = URI("#{@base_uri}#{target}")
-      request = post_request(uri, options, @auth_token)
-      response = make_http_request(uri, request)
-      return process_response(response)
+      http_request(:post, target_uri(target), options, @auth_token)
     end
 
     def get(target, options={})
-      uri = URI("#{@base_uri}#{target}")
-      request = get_request(uri, options, @auth_token)
-      response = make_http_request(uri, request)
-      return process_response(response)
+      http_request(:get, target_uri(target), options, @auth_token)
     end
 
     private
 
-    def fetch_token
-      uri = URI("#{@base_uri}/auth/login")
+    def fetch_token(email, password)
       options = {
-        email: EMAIL,
-        password: PASSWORD
+        email: email,
+        password: password
       }
-      request = post_request(uri, options)
-      response = make_http_request(uri, request)
+      return http_request(:post, target_uri("/auth/login"), options)
+    end
+
+    def http_request(request_type, uri, options, auth_token=nil)
+      case request_type
+      when :get
+        request = Net::HTTP::Get.new(uri)
+      when :post
+        request = Net::HTTP::Post.new(uri)
+      end
+      request.body = options.to_json
+      request.content_type = 'application/json'
+      if auth_token
+        request['Authorization'] = auth_token
+      end
+      response = process_request(uri, request)
       return process_response(response)
     end
 
-    def get_request(uri, options, auth_token=nil)
-      request = Net::HTTP::Get.new(uri)
-      request.body = options.to_json
-      request.content_type = 'application/json'
-      if auth_token
-        request['Authorization'] = auth_token
-      end
-      return request
-    end
-
-    def post_request(uri, options, auth_token=nil)
-      request = Net::HTTP::Post.new(uri)
-      request.body = options.to_json
-      request.content_type = 'application/json'
-      if auth_token
-        request['Authorization'] = auth_token
-      end
-      return request
-    end
-
-    def make_http_request(uri, request)
+    def process_request(uri, request)
       response = Net::HTTP.start(uri.hostname, uri.port) do |http|
         http.request(request)
       end
@@ -74,6 +61,10 @@ module Therm
       else
         raise ThermClientError, response.message
       end
+    end
+
+    def target_uri(target)
+      URI("#{@base_uri}#{target}")
     end
   end
 end
