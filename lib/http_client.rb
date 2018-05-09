@@ -1,7 +1,7 @@
-require_relative "../config.rb"
 require 'net/http'
 require 'uri'
 require 'json'
+require 'yaml'
 
 module Therm
   class HTTPClient
@@ -9,8 +9,8 @@ module Therm
     end
 
     def initialize
-      @base_uri = BASE_URL
-      @auth_token = fetch_token(EMAIL, PASSWORD)
+      @base_uri = config[:BASE_URL]
+      @auth_token = fetch_token(config[:EMAIL], config[:PASSWORD])
     end
 
     def post(target, options)
@@ -22,6 +22,10 @@ module Therm
     end
 
     private
+
+    def config
+      @config ||= YAML.load_file(File.expand_path('../../config.yml', __FILE__)).transform_keys(&:to_sym)
+    end
 
     def fetch_token(email, password)
       options = {
