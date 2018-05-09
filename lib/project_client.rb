@@ -1,5 +1,6 @@
 require_relative "http_client.rb"
 
+# interface for projects on Therm API
 module Therm
   class ProjectClient
 

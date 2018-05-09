@@ -27,6 +27,7 @@ module Therm
       @config ||= YAML.load_file(File.expand_path('../../config.yml', __FILE__)).transform_keys(&:to_sym)
     end
 
+    # login and retreive auth token
     def fetch_token(email, password)
       options = {
         email: email,
