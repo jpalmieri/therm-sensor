@@ -16,6 +16,6 @@ TODO
 * Wrap [temperature sensor library](https://github.com/timofurrer/w1thermsensor) in a ruby interface
 * Create scheduling system to periodically check and log temperature
 * Create CLI
-* Add GET for target temperature
+* Add GET for target temperature (dependent on https://github.com/jpalmieri/therm/issues/3)
 * Add interfaces for heating and cooling mechanisms
 * Create routines for heating and cooling
