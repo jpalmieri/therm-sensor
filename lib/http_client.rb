@@ -3,7 +3,7 @@ require 'uri'
 require 'json'
 require 'yaml'
 
-module Therm
+module ThermSensor
   class HTTPClient
     class ThermClientError < StandardError
     end
