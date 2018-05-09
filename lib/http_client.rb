@@ -5,7 +5,7 @@ require 'yaml'
 
 module ThermSensor
   class HTTPClient
-    class ThermClientError < StandardError
+    class ThermSensorError < StandardError
     end
 
     def initialize
@@ -64,7 +64,7 @@ module ThermSensor
       when Net::HTTPSuccess
         return JSON.parse(response.body)
       else
-        raise ThermClientError, response.message
+        raise ThermSensorError, response.message
       end
     end
 

@@ -22,7 +22,7 @@ module ThermSensor
     private
 
     def client
-      @client ||= Therm::HTTPClient.new
+      @client ||= ThermSensor::HTTPClient.new
     end
   end
 end
